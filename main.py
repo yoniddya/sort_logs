@@ -22,3 +22,14 @@ def extracting_external_IP_addresses(matrix):
             external_IP.append(ip)
     return external_IP
 
+def extracting_suspect_port(matrix):
+    external_port = []
+    suspect_port = ["22" , "23" , "3389"]
+    for row in matrix:
+        port = row[3]
+        if port in suspect_port:
+            external_port.append(row)
+        else:
+            continue
+    return external_port
+
