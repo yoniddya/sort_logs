@@ -33,3 +33,14 @@ def extracting_suspect_port(matrix):
             continue
     return external_port
 
+
+def sort_size_packet(matrix):
+    big_packet = []
+    for row in matrix:
+        size_packet = row[-1]
+        if int(size_packet) > 5000 :
+            big_packet.append(row)
+        else:
+            continue
+    return big_packet
+
