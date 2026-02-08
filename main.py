@@ -44,3 +44,15 @@ def sort_size_packet(matrix):
             continue
     return big_packet
 
+
+def tag_traffic(matrix):
+    tagged = []
+    for row in matrix:
+        size = int(row[-1])
+        tag = "LARGE" if size > 5000 else "NORMAL"
+        tagged.append(row + [tag])
+    return tagged
+
+
+def main():
+    pass
