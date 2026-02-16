@@ -53,3 +53,33 @@ def detect_suspicions(data):
 
 def filter_multi_suspicions(sus_dict):
     return {ip: susp for ip, susp in sus_dict.items() if len(susp) >= 2}
+
+
+def extract_hours(data):
+    return list(map(lambda row: int(row[0].split()[1].split(":")[0]), data))
+
+def convert_bytes_to_kb(data):
+    return list(map(lambda row: int(row[5]) / 1024, data))
+
+def filter_sensitive_ports_v2(data):
+    return list(filter(lambda row: row[3] in {"22", "23", "3389"}, data))
+
+def filter_night_activity(data):
+    return list(filter(lambda row: 0 <= int(row[0].split()[1].split(":")[0]) < 6, data))
+
+def build_suspicion_checks():
+    return {
+        "EXTERNAL_IP":   lambda row: not (row[1].startswith("192.168") or row[1].startswith("10.")),
+        "SENSITIVE_PORT": lambda row: row[3] in {"22", "23", "3389"},
+        "LARGE_PACKET":   lambda row: int(row[5]) > 5000,
+        "NIGHT_ACTIVITY": lambda row: 0 <= int(row[0].split()[1].split(":")[0]) < 6
+    }
+
+def detect_row_suspicions(row, checks):
+    return list(filter(lambda key: checks[key](row), checks))
+
+def process_log(data, checks):
+    return list(filter(
+        lambda item: len(item[1]) > 0,
+        map(lambda row: (row, detect_row_suspicions(row, checks)), data)
+    ))
