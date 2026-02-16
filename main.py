@@ -83,3 +83,39 @@ def process_log(data, checks):
         lambda item: len(item[1]) > 0,
         map(lambda row: (row, detect_row_suspicions(row, checks)), data)
     ))
+
+# 1
+def read_log_generator(filepath):
+    with open(filepath, "r") as file:
+        for line in file:
+            yield line.strip().split(",")
+
+
+# 2
+def filter_suspicious_generator(lines, checks):
+    for row in lines:
+        susp = [key for key in checks if checks[key](row)]
+        if susp:
+            yield row
+
+
+# 3
+def add_suspicion_details(lines, checks):
+    for row in lines:
+        susp = [key for key in checks if checks[key](row)]
+        yield (row, susp)
+
+
+# 4
+def count_items(gen):
+    return sum(1 for _ in gen)
+
+
+# 5
+def build_suspicion_checks_v2():
+    return {
+        "EXTERNAL_IP":   lambda row: not (row[1].startswith("192.168") or row[1].startswith("10.")),
+        "SENSITIVE_PORT": lambda row: row[3] in {"22", "23", "3389"},
+        "LARGE_PACKET":   lambda row: int(row[5]) > 5000,
+        "NIGHT_ACTIVITY": lambda row: 0 <= int(row[0].split()[1].split(":")[0]) < 6
+    }
